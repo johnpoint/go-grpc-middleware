@@ -104,12 +104,22 @@ func WithPerRetryTimeout(timeout time.Duration) CallOption {
 	}}
 }
 
+// WithAlarm Set the alarm method if the last retry still fails
+func WithAlarm(enable bool, handle func(ctx context.Context, lastErr error, method string) error) CallOption {
+	return CallOption{applyFunc: func(opt *options) {
+		opt.alarm = enable
+		opt.alarmFunc = handle
+	}}
+}
+
 type options struct {
 	max            uint
 	perCallTimeout time.Duration
 	includeHeader  bool
 	codes          []codes.Code
 	backoffFunc    BackoffFuncContext
+	alarm          bool
+	alarmFunc      func(ctx context.Context, lastErr error, method string) error
 }
 
 // CallOption is a grpc.CallOption that is local to grpc_retry.
