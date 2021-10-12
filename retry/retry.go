@@ -61,6 +61,10 @@ func UnaryClientInterceptor(optFuncs ...CallOption) grpc.UnaryClientInterceptor 
 			}
 			if !isRetriable(lastErr, callOpts) {
 				return lastErr
+			} else {
+				if attempt+1 == callOpts.max {
+					_ = callOpts.alarmFunc(callCtx, lastErr, method)
+				}
 			}
 		}
 		return lastErr

@@ -5,6 +5,7 @@ package grpc_retry_test
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"sync"
 	"testing"
@@ -153,6 +154,10 @@ func (s *RetrySuite) TestCallOptionsDontPanicWithoutInterceptor() {
 		grpc_retry.WithBackoff(grpc_retry.BackoffLinear(1*time.Millisecond)),
 		grpc_retry.WithCodes(codes.DataLoss),
 		grpc_retry.WithPerRetryTimeout(1*time.Millisecond),
+		grpc_retry.WithAlarm(true, func(ctx context.Context, lastErr error, method string) error {
+			fmt.Println("alarm!")
+			return nil
+		}),
 	)
 	require.Error(s.T(), err)
 }
